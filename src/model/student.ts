@@ -1,4 +1,3 @@
-import { timeStamp } from 'console';
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IStudent extends Document {
@@ -12,15 +11,15 @@ export interface IStudent extends Document {
 }
 
 const studentSchema: Schema = new Schema({
-    name: { type: String, required: true },
-    age: { type: Number, required: true },
-    email: { type: String, required: true, unique: true },
-    batch: { type: String, required: true },
-    course: { type: String, required: true }
-},{
+    name: { type: String, required: true, trim: true },
+    age: { type: Number, required: true, min: 1, max: 100 },
+    email: { type: String, required: true, trim: true },
+    batch: { type: String, required: true, trim: true },
+    course: { type: String, required: true, trim: true }
+}, {
     timestamps: true
-})
+});
 
-const Student = mongoose.model<IStudent>('student',studentSchema)
+const Student = mongoose.model<IStudent>('Student', studentSchema);
 
 export default Student;

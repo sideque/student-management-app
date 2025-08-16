@@ -1,12 +1,13 @@
-import express from 'express';
-import studentController from '../controller/studentController';
-const StudentController = new studentController();
-const router = express.Router();
+import express, { Router } from 'express';
+import StudentController from '../controller/studentController';
 
-router.get('/', StudentController.getMainPage);
-router.post('/addStudent', StudentController.AddStudent);
-router.post('/editStudent', StudentController.deleteStudent);
-router.delete('/delete/:id', StudentController.deleteStudent);
-router.get('/search/searchterm', StudentController.searchTerm);
+const router: Router = express.Router();
+const studentController = new StudentController();
+
+router.get('/', studentController.getMainPage);
+router.post('/addStudent', studentController.addStudent);
+router.post('/editStudent', studentController.editStudent);
+router.delete('/delete/:id', studentController.deleteStudent);
+router.get('/search/:query', studentController.searchTerm);
 
 export default router;
