@@ -1,364 +1,457 @@
-<!DOCTYPE html>
+<!DOCTYPE<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #d70000 0%, #000000 100%);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 25%, #4a1515 50%, #2d1b1a 75%, #1a1a1a 100%);
+      font-family: 'Arial', sans-serif;
+    }
 
-        .card-shadow {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+    .neon-glow {
+      box-shadow: 0 0 16px rgba(220, 38, 127, 0.25), 0 0 28px rgba(220, 38, 127, 0.08);
+    }
 
-        .hover-scale {
-            transition: transform 0.2s ease;
-        }
+    .red-glow {
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+    }
 
-        .hover-scale:hover {
-            transform: scale(1.02);
-        }
+    .glass-effect {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(220, 38, 127, 0.18);
+    }
 
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
+    .hover-lift {
+      transition: all 0.25s ease;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(220, 38, 127, 0.25);
+    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
 
-        .table-row:hover {
-            background-color: #f8fafc;
-        }
-    </style>
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-32px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .pulse-red {
+      animation: pulseRed 2s infinite;
+    }
+
+    @keyframes pulseRed {
+      0%,
+      100% {
+        box-shadow: 0 0 4px rgba(239, 68, 68, 0.35);
+      }
+
+      50% {
+        box-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
+      }
+    }
+
+    .table-row-hover:hover {
+      background: linear-gradient(90deg, rgba(220, 38, 127, 0.08) 0%, rgba(0, 0, 0, 0.1) 100%);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #dc2626;
+      border-radius: 4px;
+    }
+
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+    }
+
+    /* --- SIZE TUNING (Medium) --- */
+    :root {
+      /* Optional: tweak this 0.90–1.00 if you still want global scaling */
+      --ui-scale: 0.95;
+    }
+
+    body { transform-origin: top center; }
+    @media (min-width: 768px) {
+      body { transform: scale(var(--ui-scale)); }
+    }
+  </style>
 </head>
 
-<body class="min-h-screen gradient-bg">
-    <div class="container mx-auto p-6">
-        <!-- Header Section -->
-        <div class="text-center mb-8 animate-fade-in">
-            <h1 class="text-5xl font-bold text-white mb-2">
-                <i class="fas fa-graduation-cap mr-3"></i>
-                Student Management
-            </h1>
-            <p class="text-white text-lg opacity-90">Manage your students with ease and efficiency</p>
+<body class="min-h-screen text-white">
+  <!-- Header Section -->
+  <div class="relative overflow-hidden">
+    <div class="container mx-auto px-6 md:px-8 py-8 md:py-10">
+      <div class="text-center slide-in">
+        <div class="inline-block p-3 rounded-full glass-effect mb-4">
+          <i class="fas fa-user-graduate text-3xl md:text-4xl text-red-500"></i>
         </div>
-
-        <!-- Message Alert -->
-        <% if (typeof message !=='undefined' ) { %>
-            <div id="message"
-                class="mb-6 px-6 py-4 rounded-lg shadow-lg <%= message.type === 'success' ? 'bg-green-100 text-green-800 border-l-4 border-green-500' : 'bg-red-100 text-red-800 border-l-4 border-red-500' %> animate-fade-in">
-                <div class="flex items-center">
-                    <i
-                        class="<%= message.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle' %> mr-3"></i>
-                    <%= message.content %>
-                </div>
-            </div>
-            <% } %>
-
-
-             <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-effect rounded-2xl p-6 hover-lift">
-                <div class="flex items-center">
-                    <div class="p-3 bg-red-600 rounded-full mr-4 pulse-red">
-                        <i class="fas fa-users text-2xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-3xl font-bold text-red-400"><%= students.length %></h3>
-                        <p class="text-gray-400">Total Students</p>
-                    </div>
-                </div>
-            </div>
-            <div class="glass-effect rounded-2xl p-6 hover-lift">
-                <div class="flex items-center">
-                    <div class="p-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mr-4">
-                        <i class="fas fa-book text-2xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-3xl font-bold text-pink-400"><%= [...new Set(students.map(s => s.course))].length %></h3>
-                        <p class="text-gray-400">Active Courses</p>
-                    </div>
-                </div>
-            </div>
-            <div class="glass-effect rounded-2xl p-6 hover-lift">
-                <div class="flex items-center">
-                    <div class="p-3 bg-black border-2 border-red-500 rounded-full mr-4">
-                        <i class="fas fa-layer-group text-2xl text-red-400"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-3xl font-bold text-red-300"><%= [...new Set(students.map(s => s.batch))].length %></h3>
-                        <p class="text-gray-400">Active Batches</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-                <!-- Controls Section -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-6 animate-fade-in">
-                    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <!-- Search Bar -->
-                        <div class="flex-1 relative">
-                            <!-- Search Button on the right -->
-                            <button onclick="search()" type="submit"
-                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-blue-600">
-                                <i class="fas fa-search"></i>
-                            </button>
-
-                            <!-- Input with padding to the right for the button -->
-                            <input id="searchInput" type="text" placeholder="Search students..."
-                                class="w-full pr-12 pl-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
-                        </div>
-
-                        <!-- Add Student Button -->
-                        <button
-                            class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover-scale shadow-lg flex items-center gap-2"
-                            onclick="document.getElementById('addModal').classList.remove('hidden')">
-                            <i class="fas fa-plus"></i>
-                            Add Student
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Student Table -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden animate-fade-in">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                                <tr>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-user mr-2"></i>Name
-                                    </th>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-envelope mr-2"></i>Email
-                                    </th>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-birthday-cake mr-2"></i>Age
-                                    </th>
-                                    <th class="px-6 py-4 text-left ">
-                                        <i class="fas fa-book mr-2"></i>Course
-                                    </th>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-layer-group mr-2"></i>Batch
-                                    </th>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-calendar mr-2"></i>Created
-                                    </th>
-                                    <th class="px-6 py-4 text-left font-semibold">
-                                        <i class="fas fa-sync mr-2"></i>Updated
-                                    </th>
-                                    <th class="px-6 py-4 text-center font-semibold">
-                                        <i class="fas fa-cogs mr-2"></i>Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentTableBody">
-                                <% students.forEach((student, index)=> { %>
-                                    <tr class="table-row border-b border-gray-200">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center">
-                                                <div
-                                                    class="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
-                                                    <i class="fas fa-user text-white"></i>
-                                                </div>
-                                                <span class="font-semibold text-gray-800">
-                                                    <%= student.name %>
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <%= student.email %>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <%= student.age %>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                <%= student.course %>
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <span
-                                                class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                <%= student.batch %>
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <%= new Date(student.createdAt).toLocaleDateString() %>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-600">
-                                            <%= new Date(student.updatedAt).toLocaleDateString() %>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex gap-2 justify-center">
-                                                <button
-                                                    class="bg-yellow-500 text-white px-3 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors flex items-center gap-1"
-                                                    onclick="openEditModal('<%=student._id %>','<%= student.name %>', '<%= student.age %>', '<%= student.email %>', '<%= student.batch %>', '<%= student.course %>')"
-                                                    title="Edit Student">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button
-                                                    class="bg-red-500 text-white px-3 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors flex items-center gap-1 delete-btn"
-                                                    data-id="<%= student._id %>" title="Delete Student">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Add Modal -->
-                <form id="AddForm" method="post">
-                    <div id="addModal"
-                        class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
-                        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md mx-4">
-                            <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Add New Student</h2>
-                            <!-- Name -->
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Name</label>
-                                <input type="text" name="name" id="name"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                                <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Name must be at least 2
-                                    letters</p>
-                            </div>
-
-                            <!-- Age -->
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Age</label>
-                                <input type="number" name="age" id="age"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                                <p id="ageError" class="text-red-500 text-sm mt-1 hidden">Enter a valid age (1–120)</p>
-                            </div>
-
-                            <!-- Email -->
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Email</label>
-                                <input type="email" name="email" id="email"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                                <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Invalid email format</p>
-                            </div>
-
-                            <!-- Batch -->
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Batch</label>
-                                <input type="text" name="batch" id="batch"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                                <p id="batchError" class="text-red-500 text-sm mt-1 hidden">Batch is required (letters &
-                                    digits only)</p>
-                            </div>
-
-                            <!-- Course -->
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Course</label>
-                                <input type="text" name="course" id="course"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                                <p id="courseError" class="text-red-500 text-sm mt-1 hidden">Course is required</p>
-                            </div>
-
-                            <div class="flex justify-end gap-2">
-                                <button type="button"
-                                    class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-600 transition-colors"
-                                    onclick="document.getElementById('addModal').classList.add('hidden')">Cancel</button>
-                                <button
-                                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Edit Modal -->
-                <form id="editForm" method="post">
-                    <div id="editModal"
-                        class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
-                        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md mx-4">
-                            <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Edit Student</h2>
-                            <input type="hidden" id="editId" name="id">
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Name</label>
-                                <input id="editName" name="name" type="text"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Age</label>
-                                <input id="editAge" name="age" type="number"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Email</label>
-                                <input id="editEmail" name="email" type="email"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Batch</label>
-                                <input id="editBatch" name="batch" type="text"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block mb-2 text-gray-700 font-semibold">Course</label>
-                                <input id="editCourse" name="course" type="text"
-                                    class="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="flex justify-end gap-2">
-                                <button type="button"
-                                    class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-gray-600 transition-colors"
-                                    onclick="document.getElementById('editModal').classList.add('hidden')">
-                                    Cancel
-                                </button>
-                                <button
-                                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+        <h1 class="text-2xl md:text-3xl font-extrabold mb-2 bg-gradient-to-r from-red-500 via-red-600 to-red-700 bg-clip-text text-transparent">
+          STUDENT HUB
+        </h1>
+        <p class="text-base md:text-lg text-gray-300 font-light tracking-wide">Advanced Student Management System</p>
+        <div class="w-24 md:w-28 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto mt-4 rounded-full"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- Message Alert -->
+  <% if (typeof message !== 'undefined') { %>
+  <div class="container mx-auto px-6 md:px-8 mb-6 md:mb-8">
+    <div id="message"
+      class="glass-effect rounded-2xl p-4 md:p-5 border-l-4 <%= message.type === 'success' ? 'border-green-500' : 'border-red-500' %> slide-in">
+      <div class="flex items-center">
+        <i
+          class="<%= message.type === 'success' ? 'fas fa-check-circle text-green-400' : 'fas fa-exclamation-triangle text-red-400' %> text-xl md:text-2xl mr-3"></i>
+        <span class="text-base md:text-lg"><%= message.content %></span>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Stats Dashboard -->
+  <div class="container mx-auto px-6 md:px-8 mb-8 md:mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <!-- Total Students -->
+      <div class="glass-effect rounded-2xl p-6 hover-lift">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-2xl md:text-3xl font-bold text-red-400 mb-1"><%= students.length %></h3>
+            <p class="text-gray-300 text-sm md:text-base uppercase tracking-wider">Total Students</p>
+          </div>
+          <div class="p-4 md:p-5 bg-gradient-to-br from-red-600 to-red-800 rounded-xl pulse-red">
+            <i class="fas fa-users text-2xl md:text-3xl text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Courses -->
+      <div class="glass-effect rounded-2xl p-6 hover-lift">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-2xl md:text-3xl font-bold text-red-400 mb-1"><%= [...new Set(students.map(s => s.course))].length %></h3>
+            <p class="text-gray-300 text-sm md:text-base uppercase tracking-wider">Active Courses</p>
+          </div>
+          <div class="p-4 md:p-5 bg-gradient-to-br from-gray-800 to-black rounded-xl border border-red-500">
+            <i class="fas fa-book-open text-2xl md:text-3xl text-red-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Batches -->
+      <div class="glass-effect rounded-2xl p-6 hover-lift">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-3xl md:text-4xl font-bold text-red-400 mb-1"><%= [...new Set(students.map(s => s.batch))].length %></h3>
+            <p class="text-gray-300 text-sm md:text-base uppercase tracking-wider">Active Batches</p>
+          </div>
+          <div class="p-4 md:p-5 bg-gradient-to-br from-red-900 to-black rounded-xl">
+            <i class="fas fa-layer-group text-2xl md:text-3xl text-red-300"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Controls -->
+  <div class="container mx-auto px-6 md:px-8 mb-6 md:mb-8">
+    <div class="glass-effect rounded-2xl p-6">
+      <div class="flex flex-col lg:flex-row gap-4 md:gap-6 items-center">
+        <!-- Search Section -->
+        <div class="flex-1 relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-4 md:pl-5 flex items-center pointer-events-none">
+            <i class="fas fa-search text-red-400 text-base md:text-lg"></i>
+          </div>
+          <input id="searchInput" type="text" placeholder="Search students by name, email, course..."
+            class="w-full pl-12 md:pl-14 pr-4 md:pr-5 py-3 md:py-3.5 bg-black bg-opacity-50 border-2 border-red-500 rounded-xl text-white placeholder-gray-400 text-sm md:text-base focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+        </div>
+
+        <!-- Add Button -->
+        <button onclick="document.getElementById('addModal').classList.remove('hidden')"
+          class="bg-gradient-to-r from-red-600 to-red-800 text-white px-5 md:px-6 py-3 rounded-xl font-semibold text-sm md:text-base hover:from-red-700 hover:to-red-900 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-red-500/20 flex items-center gap-2">
+          <i class="fas fa-plus-circle text-sm md:text-base"></i>
+          Add Student
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Table -->
+  <div class="container mx-auto px-6 md:px-8 mb-8 md:mb-10">
+    <div class="glass-effect rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full">
+          <thead class="bg-gradient-to-r from-red-700 to-black">
+            <tr>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-user mr-2"></i>Student
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-envelope mr-2"></i>Email
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-calendar-alt mr-2"></i>Age
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-graduation-cap mr-2"></i>Course
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-users mr-2"></i>Batch
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-plus-circle mr-2"></i>Created
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-left text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-edit mr-2"></i>Updated
+              </th>
+              <th class="px-5 md:px-6 py-4 md:py-5 text-center text-sm md:text-base font-bold text-white uppercase tracking-wider">
+                <i class="fas fa-cogs mr-2"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <% students.forEach((student, index) => { %>
+            <tr class="table-row-hover border-b border-gray-700 transition-all duration-200">
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center mr-3 md:mr-4 shadow-lg">
+                    <span class="text-white font-semibold text-lg md:text-xl"><%= student.name.charAt(0).toUpperCase() %></span>
+                  </div>
+                  <div>
+                    <div class="text-base md:text-lg font-bold text-white"><%= student.name %></div>
+                    <div class="text-xs md:text-sm text-gray-400">Student ID: #<%= index + 1001 %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <div class="text-gray-300 text-sm md:text-base"><%= student.email %></div>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <span class="bg-gradient-to-r from-red-600 to-red-800 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg font-semibold text-sm md:text-base">
+                  <%= student.age %>
+                </span>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <span class="bg-gradient-to-r from-gray-700 to-black text-red-400 px-3 md:px-4 py-1.5 md:py-2 rounded-lg font-semibold text-sm md:text-base border border-red-500">
+                  <%= student.course %>
+                </span>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <span class="bg-gradient-to-r from-red-900 to-black text-red-300 px-3 md:px-4 py-1.5 md:py-2 rounded-lg font-semibold text-sm md:text-base border border-red-700">
+                  <%= student.batch %>
+                </span>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <div class="text-gray-300 text-sm md:text-base"><%= new Date(student.createdAt).toLocaleDateString() %></div>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <div class="text-gray-300 text-sm md:text-base"><%= new Date(student.updatedAt).toLocaleDateString() %></div>
+              </td>
+              <td class="px-5 md:px-6 py-4 md:py-5">
+                <div class="flex gap-2 md:gap-3 justify-center">
+                  <button onclick="openEditModal('<%= student._id %>','<%= student.name %>', '<%= student.age %>', '<%= student.email %>', '<%= student.batch %>', '<%= student.course %>')"
+                    class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-3 md:px-4 py-2 rounded-lg font-bold hover:from-yellow-600 hover:to-yellow-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                    title="Edit Student">
+                    <i class="fas fa-edit text-base md:text-lg"></i>
+                  </button>
+                  <button class="bg-gradient-to-r from-red-600 to-red-800 text-white px-3 md:px-4 py-2 rounded-lg font-bold hover:from-red-700 hover:to-red-900 transform hover:scale-105 transition-all duration-200 shadow-lg delete-btn"
+                    data-id="<%= student._id %>" title="Delete Student">
+                    <i class="fas fa-trash text-base md:text-lg"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <form id="AddForm" method="post">
+    <div id="addModal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+      <div class="glass-effect p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-2xl mx-6">
+        <div class="text-center mb-6">
+          <div class="inline-block p-3 bg-gradient-to-r from-red-600 to-red-800 rounded-xl mb-3">
+            <i class="fas fa-user-plus text-2xl text-white"></i>
+          </div>
+          <h2 class="text-xl md:text-2xl font-bold text-white mb-1">Add New Student</h2>
+          <div class="w-20 h-1 bg-red-500 mx-auto rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <!-- Name -->
+          <div>
+            <label class="block mb-2 text-red-400 font-bold text-sm md:text-base">Name</label>
+            <input type="text" name="name" id="name"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-red-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+            <p id="nameError" class="text-red-400 text-xs md:text-sm mt-2 hidden">Name must be at least 2 letters</p>
+          </div>
+
+          <!-- Age -->
+          <div>
+            <label class="block mb-2 text-red-400 font-bold text-sm md:text-base">Age</label>
+            <input type="number" name="age" id="age"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-red-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+            <p id="ageError" class="text-red-400 text-xs md:text-sm mt-2 hidden">Enter a valid age (1–120)</p>
+          </div>
+
+          <!-- Email -->
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-red-400 font-bold text-sm md:text-base">Email</label>
+            <input type="email" name="email" id="email"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-red-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+            <p id="emailError" class="text-red-400 text-xs md:text-sm mt-2 hidden">Invalid email format</p>
+          </div>
+
+          <!-- Batch -->
+          <div>
+            <label class="block mb-2 text-red-400 font-bold text-sm md:text-base">Batch</label>
+            <input type="text" name="batch" id="batch"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-red-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+            <p id="batchError" class="text-red-400 text-xs md:text-sm mt-2 hidden">Batch is required (letters & digits only)</p>
+          </div>
+
+          <!-- Course -->
+          <div>
+            <label class="block mb-2 text-red-400 font-bold text-sm md:text-base">Course</label>
+            <input type="text" name="course" id="course"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-red-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-40 transition-all duration-200" />
+            <p id="courseError" class="text-red-400 text-xs md:text-sm mt-2 hidden">Course is required</p>
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-3 md:gap-4 mt-6">
+          <button type="button" onclick="document.getElementById('addModal').classList.add('hidden')"
+            class="bg-gradient-to-r from-gray-600 to-gray-800 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition-all duration-200">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-gradient-to-r from-red-600 to-red-800 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:from-red-700 hover:to-red-900 transform hover:scale-105 transition-all duration-200 shadow-lg">
+            <i class="fas fa-save mr-2"></i>Save Student
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Edit Modal -->
+  <form id="editForm" method="post">
+    <div id="editModal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+      <div class="glass-effect p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-2xl mx-6">
+        <div class="text-center mb-6">
+          <div class="inline-block p-3 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl mb-3">
+            <i class="fas fa-user-edit text-2xl text-black"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-white mb-1">Edit Student</h2>
+          <div class="w-20 h-1 bg-yellow-500 mx-auto rounded-full"></div>
+        </div>
+
+        <input type="hidden" id="editId" name="id" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <!-- Name -->
+          <div>
+            <label class="block mb-2 text-yellow-400 font-bold text-sm md:text-base">Name</label>
+            <input id="editName" name="name" type="text"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-yellow-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-40 transition-all duration-200" />
+          </div>
+
+          <!-- Age -->
+          <div>
+            <label class="block mb-2 text-yellow-400 font-bold text-sm md:text-base">Age</label>
+            <input id="editAge" name="age" type="number"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-yellow-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-40 transition-all duration-200" />
+          </div>
+
+          <!-- Email -->
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-yellow-400 font-bold text-sm md:text-base">Email</label>
+            <input id="editEmail" name="email" type="email"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-yellow-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-40 transition-all duration-200" />
+          </div>
+
+          <!-- Batch -->
+          <div>
+            <label class="block mb-2 text-yellow-400 font-bold text-sm md:text-base">Batch</label>
+            <input id="editBatch" name="batch" type="text"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-yellow-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-40 transition-all duration-200" />
+          </div>
+
+          <!-- Course -->
+          <div>
+            <label class="block mb-2 text-yellow-400 font-bold text-sm md:text-base">Course</label>
+            <input id="editCourse" name="course" type="text"
+              class="w-full p-3 bg-black bg-opacity-50 border-2 border-yellow-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-40 transition-all duration-200" />
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-3 md:gap-4 mt-6">
+          <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')"
+            class="bg-gradient-to-r from-gray-600 to-gray-800 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:from-gray-700 hover:to-gray-900 transform hover:scale-105 transition-all duration-200">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-5 py-2.5 rounded-lg font-semibold text-sm hover:from-yellow-600 hover:to-yellow-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+            <i class="fas fa-save mr-2"></i>Update Student
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
         const validators = {
             name: {
-                regex: /^[A-Za-z\s]{2,}$/, // at least 2 letters
+                regex: /^[A-Za-z\s]{2,}$/,
                 errorMsg: "Name must be at least 2 letters"
             },
             age: {
-                regex: /^(1[1][0-9]|100|[1-9][0-9]?)$/, // age 1-120
+                regex: /^(1[1][0-9]|100|[1-9][0-9]?)$/,
                 errorMsg: "Enter a valid age (1–100)"
             },
             email: {
-                regex: /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // basic email
+                regex: /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                 errorMsg: "Invalid email format"
             },
             batch: {
-                regex: /^[A-Za-z0-9\s]{2,}$/, // letters and numbers only
+                regex: /^[A-Za-z0-9\s]{2,}$/,
                 errorMsg: "Batch is required (letters & digits only)"
             },
             course: {
-                regex: /^[A-Za-z\s]{2,}$/, // at least 2 letters
+                regex: /^[A-Za-z\s]{2,}$/,
                 errorMsg: "Course is required"
             }
         };
 
-        
         function validateField(fieldId) {
             const input = document.getElementById(fieldId);
             const error = document.getElementById(fieldId + "Error");
@@ -376,55 +469,66 @@
                 return true;
             }
         }
+
         Object.keys(validators).forEach(fieldId => {
             const input = document.getElementById(fieldId);
             input.addEventListener('input', () => validateField(fieldId));
         });
 
-
-        function generateStudentRow(student) {
+        function generateStudentRow(student, index = 0) {
             return `
-                    <tr class="table-row border-b border-gray-200">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-user text-white"></i>
-                                </div>
-                                <span class="font-semibold text-gray-800">${student.name}</span>
+                <tr class="table-hover border-b border-gray-700 transition-all duration-300">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center">
+                            <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                                <span class="text-white font-bold text-xl">${student.name.charAt(0).toUpperCase()}</span>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">${student.email}</td>
-                        <td class="px-6 py-4 text-gray-600">${student.age}</td>
-                        <td class="px-6 py-4">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                                ${student.course}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                                ${student.batch}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">${new Date(student.createdAt).toLocaleDateString()}</td>
-                        <td class="px-6 py-4 text-gray-600">${new Date(student.updatedAt).toLocaleDateString()}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2 justify-center">
-                                <button
-                                    class="bg-yellow-500 text-white px-3 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors flex items-center gap-1"
-                                    onclick="openEditModal('${student._id}','${student.name}', '${student.age}', '${student.email}', '${student.batch}', '${student.course}')"
-                                    title="Edit Student">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button
-                                    class="bg-red-500 text-white px-3 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors flex items-center gap-1"
-                                    onclick="del('${student._id}')"
-                                    title="Delete Student">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div>
+                                <div class="text-xl font-bold text-white">${student.name}</div>
+                                <div class="text-sm text-gray-400">Student ID: #${index + 1001}</div>
                             </div>
-                        </td>
-                    </tr>
-                     `;
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="text-gray-300 text-lg">${student.email}</div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-xl font-semibold text-lg">
+                            ${student.age}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="bg-gradient-to-r from-gray-700 to-black text-red-400 px-4 py-2 rounded-xl font-semibold text-lg border border-red-500">
+                            ${student.course}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="bg-gradient-to-r from-red-900 to-black text-red-300 px-4 py-2 rounded-xl font-semibold text-lg border border-red-700">
+                            ${student.batch}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="text-gray-300 text-lg">${new Date(student.createdAt).toLocaleDateString()}</div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="text-gray-300 text-lg">${new Date(student.updatedAt).toLocaleDateString()}</div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="flex gap-3 justify-center">
+                            <button onclick="openEditModal('${student._id}','${student.name}', '${student.age}', '${student.email}', '${student.batch}', '${student.course}')"
+                                class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-3 rounded-xl font-bold hover:from-yellow-600 hover:to-yellow-700 transform hover:scale-110 transition-all duration-300 shadow-lg"
+                                title="Edit Student">
+                                <i class="fas fa-edit text-lg"></i>
+                            </button>
+                            <button onclick="del('${student._id}')"
+                                class="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-3 rounded-xl font-bold hover:from-red-700 hover:to-red-900 transform hover:scale-110 transition-all duration-300 shadow-lg"
+                                title="Delete Student">
+                                <i class="fas fa-trash text-lg"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
         }
 
         function attachDeleteListeners() {
@@ -436,12 +540,11 @@
             });
         }
 
-        // Call it initially
         attachDeleteListeners();
         document.getElementById("searchInput").addEventListener("input", search);
 
         function openEditModal(id, name, age, email, batch, course) {
-            document.getElementById('editId').value = id
+            document.getElementById('editId').value = id;
             document.getElementById('editName').value = name;
             document.getElementById('editAge').value = age;
             document.getElementById('editEmail').value = email;
@@ -450,29 +553,28 @@
             document.getElementById('editModal').classList.remove('hidden');
         }
 
-        const EditForm = document.getElementById('editForm')
+        const EditForm = document.getElementById('editForm');
         EditForm.addEventListener("submit", (e) => {
-            e.preventDefault()
-            const editId = document.getElementById('editId').value
-            const formData = new FormData(EditForm)
+            e.preventDefault();
+            const editId = document.getElementById('editId').value;
+            const formData = new FormData(EditForm);
             const name = formData.get('name').trim();
             const age = formData.get('age').trim();
             const email = formData.get('email').trim();
             const batch = formData.get('batch').trim();
             const course = formData.get('course').trim();
 
-            // Regex Patterns
             const nameRegex = /^[A-Za-z\s]+$/;
-            const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;;
+            const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             const batchRegex = /^[A-Za-z0-9\s]+$/;
             const courseRegex = /^[A-Za-z\s]+$/;
             const ageRegex = /^(1[1][0-9]|100|[1-9][0-9]?)$/;
-            // Validation Flags
+            
             let errors = [];
 
             if (!name || !nameRegex.test(name)) errors.push("Name is invalid.");
             if (!age || isNaN(age) || parseInt(age) <= 0) errors.push("Age must be a positive number.");
-            if (!ageRegex.test(age)) errors.push("age should be between 1 to 100")
+            if (!ageRegex.test(age)) errors.push("Age should be between 1 to 100");
             if (!email || !emailRegex.test(email)) errors.push("Email format is invalid.");
             if (!batch || !batchRegex.test(batch)) errors.push("Batch is invalid.");
             if (!course || !courseRegex.test(course)) errors.push("Course is invalid.");
@@ -481,11 +583,14 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Form Validation Failed',
-                    html: errors.join("<br>"), // display all errors
-                    confirmButtonColor: '#d33'
+                    html: errors.join("<br>"),
+                    confirmButtonColor: '#dc2626',
+                    background: '#1f2937',
+                    color: '#fff'
                 });
-                return; // stop further execution
+                return;
             }
+
             const EditedData = {
                 id: editId,
                 name: formData.get('name'),
@@ -493,7 +598,8 @@
                 email: formData.get('email'),
                 batch: formData.get('batch'),
                 course: formData.get('course'),
-            }
+            };
+
             fetch('/editStudent', {
                 method: "POST",
                 headers: {
@@ -501,102 +607,98 @@
                 },
                 body: JSON.stringify(EditedData)
             })
-                .then((res) => res.json())
-                .then((response) => {
-                    console.log(response)
-                    if (response.success) {
-                        document.getElementById('editModal').classList.add('hidden')
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Updated!',
-                            text: response.message,
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK'
-                        })
-                        const tbody = document.getElementById("studentTableBody");
-                        tbody.innerHTML = "";
-                        response.students.forEach((student) => {
-                            tbody.innerHTML += generateStudentRow(student)
-                        })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Update Failed',
-                            text: response.message || 'Failed to update student.',
-                            confirmButtonColor: '#d33',
-                            confirmButtonText: 'Retry'
-                        });
-                    }
-
-                })
-        })
+            .then((res) => res.json())
+            .then((response) => {
+                if (response.success) {
+                    document.getElementById('editModal').classList.add('hidden');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: response.message,
+                        confirmButtonColor: '#dc2626',
+                        background: '#1f2937',
+                        color: '#fff'
+                    });
+                    const tbody = document.getElementById("studentTableBody");
+                    tbody.innerHTML = "";
+                    response.students.forEach((student, index) => {
+                        tbody.innerHTML += generateStudentRow(student, index);
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Update Failed',
+                        text: response.message || 'Failed to update student.',
+                        confirmButtonColor: '#dc2626',
+                        background: '#1f2937',
+                        color: '#fff'
+                    });
+                }
+            });
+        });
 
         function del(id) {
-            console.log(id, 'id')
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, delete it!',
+                background: '#1f2937',
+                color: '#fff'
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/delete/${id}`, {
                         method: "DELETE",
                     })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            console.log(data, 'data');
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: 'Student deleted successfully!',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'OK'
-                                }).then(() => {
-                                    const tbody = document.getElementById("studentTableBody");
-                                    tbody.innerHTML = "";
-                                    const students = data.students
-                                    students.forEach((student) => {
-                                        tbody.innerHTML += generateStudentRow(student)
-                                    })
-
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Student deleted successfully!',
+                                confirmButtonColor: '#dc2626',
+                                background: '#1f2937',
+                                color: '#fff'
+                            }).then(() => {
+                                const tbody = document.getElementById("studentTableBody");
+                                tbody.innerHTML = "";
+                                data.students.forEach((student, index) => {
+                                    tbody.innerHTML += generateStudentRow(student, index);
                                 });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: data.message || "Deletion failed.",
-                                    confirmButtonColor: '#d33',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        })
-                        .catch((err) => {
-                            console.error("Error deleting student:", err);
+                            });
+                        } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error',
-                                text: "Something went wrong while deleting.",
-                                confirmButtonColor: '#d33',
-                                confirmButtonText: 'OK'
+                                title: 'Oops...',
+                                text: data.message || "Deletion failed.",
+                                confirmButtonColor: '#dc2626',
+                                background: '#1f2937',
+                                color: '#fff'
                             });
+                        }
+                    })
+                    .catch((err) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: "Something went wrong while deleting.",
+                            confirmButtonColor: '#dc2626',
+                            background: '#1f2937',
+                            color: '#fff'
                         });
-                } else {
-                    console.log("User cancelled the deletion.");
+                    });
                 }
             });
         }
 
-        const message = document.getElementById('message')
+        const message = document.getElementById('message');
         setTimeout(() => {
             if (message) {
-                message.style.display = "none"
-            } else {
-                message.style.display = "display"
+                message.style.display = "none";
             }
         }, 3000);
 
@@ -611,12 +713,15 @@
                     const tbody = document.getElementById("studentTableBody");
                     tbody.innerHTML = "";
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="8" class="px-8 py-16 text-center text-gray-400 text-xl">
+                            <i class="fas fa-search-minus text-4xl mb-4"></i><br>
+                            No students found matching your search.
+                        </td></tr>`;
                         return;
                     }
 
-                    data.forEach(student => {
-                        tbody.innerHTML += generateStudentRow(student);
+                    data.forEach((student, index) => {
+                        tbody.innerHTML += generateStudentRow(student, index);
                     });
                 })
                 .catch(err => {
@@ -624,17 +729,18 @@
                 });
         }
 
-        const addForm = document.getElementById('AddForm')
+        const addForm = document.getElementById('AddForm');
         addForm.addEventListener("submit", (e) => {
-            e.preventDefault()
-            let formdata = new FormData(addForm)
+            e.preventDefault();
+            let formdata = new FormData(addForm);
             let data = {
                 name: formdata.get('name'),
                 age: formdata.get('age'),
                 email: formdata.get('email'),
                 batch: formdata.get('batch'),
                 course: formdata.get('course')
-            }
+            };
+            
             let isFormValid = true;
             Object.keys(validators).forEach(fieldId => {
                 const valid = validateField(fieldId);
@@ -647,8 +753,9 @@
                     icon: 'error',
                     title: 'Form is invalid',
                     text: 'Please fix the highlighted fields before submitting.',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Okay'
+                    confirmButtonColor: '#dc2626',
+                    background: '#1f2937',
+                    color: '#fff'
                 });
             } else {
                 fetch("/addStudent", {
@@ -658,48 +765,52 @@
                     },
                     body: JSON.stringify(data),
                 })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        console.log(data, 'data')
-                        if (data.success === false) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Something Went Wrong',
-                                text: data.message,
-                                confirmButtonText: 'OK',
-                                confirmButtonColor: '#d33'
-                            });
-                            return;
-                        }
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: 'Added successfully',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                        }
-                        const tbody = document.getElementById("studentTableBody");
-                        tbody.innerHTML = "";
-                        if (data.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>`;
-                            return;
-                        }
-
-                        const modal = document.getElementById('addModal')
-                        const form = document.getElementById('AddForm')
-                        modal.classList.add('hidden')
-                        form.reset()
-                        console.log(data.students, 'here it is')
-                        data.students.forEach(student => {
-                            tbody.innerHTML += generateStudentRow(student)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.success === false) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something Went Wrong',
+                            text: data.message,
+                            confirmButtonColor: '#dc2626',
+                            background: '#1f2937',
+                            color: '#fff'
                         });
-                    })
+                        return;
+                    }
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Student added successfully',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            background: '#1f2937',
+                            color: '#fff'
+                        });
+                    }
+                    const tbody = document.getElementById("studentTableBody");
+                    tbody.innerHTML = "";
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="8" class="px-8 py-16 text-center text-gray-400 text-xl">
+                            <i class="fas fa-users-slash text-4xl mb-4"></i><br>
+                            No students found.
+                        </td></tr>`;
+                        return;
+                    }
+
+                    const modal = document.getElementById('addModal');
+                    const form = document.getElementById('AddForm');
+                    modal.classList.add('hidden');
+                    form.reset();
+                    
+                    data.students.forEach((student, index) => {
+                        tbody.innerHTML += generateStudentRow(student, index);
+                    });
+                });
             }
-        })
+        });
     </script>
 </body>
-
-</html> 
+<!-- check -->
+</html>
