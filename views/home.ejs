@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Student Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 25%, #4a1515 50%, #2d1b1b 75%, #1a1a1a 100%);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(220, 38, 127, 0.3), 0 0 40px rgba(220, 38, 127, 0.1);
+        }
+
+        .red-glow {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .glass-effect {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(220, 38, 127, 0.2);
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 127, 0.3);
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .pulse-red {
+            animation: pulseRed 2s infinite;
+        }
+
+        @keyframes pulseRed {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        .table-row-hover:hover {
+            background: linear-gradient(90deg, rgba(220, 38, 127, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dc2626;
+            border-radius: 4px;
+        }
+
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white">
+    <div class="container mx-auto p-6 max-w-7xl">
+        <!-- Header Section -->
+        <div class="text-center mb-8 slide-in">
+            <div class="inline-block">
+                <h1 class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-600 mb-4">
+                    <i class="fas fa-user-graduate mr-4 text-red-500"></i>
+                    ELITE STUDENT PORTAL
+                </h1>
+                <div class="h-1 bg-gradient-to-r from-red-600 via-pink-500 to-red-600 rounded-full neon-glow"></div>
+            </div>
+            <p class="text-gray-300 text-xl mt-4 font-light">Advanced Student Management System</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-effect rounded-2xl p-6 hover-lift">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-600 rounded-full mr-4 pulse-red">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-red-400" id="totalStudents">0</h3>
+                        <p class="text-gray-400">Total Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 hover-lift">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mr-4">
+                        <i class="fas fa-book text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-pink-400" id="totalCourses">0</h3>
+                        <p class="text-gray-400">Active Courses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 hover-lift">
+                <div class="flex items-center">
+                    <div class="p-3 bg-black border-2 border-red-500 rounded-full mr-4">
+                        <i class="fas fa-layer-group text-2xl text-red-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-red-300" id="totalBatches">0</h3>
+                        <p class="text-gray-400">Active Batches</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="glass-effect rounded-2xl p-6 mb-8 hover-lift">
+            <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+                <!-- Search Section -->
+                <div class="flex-1 relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-red-400 group-focus-within:text-pink-400 transition-colors"></i>
+                    </div>
+                    <input 
+                        id="searchInput" 
+                        type="text" 
+                        placeholder="Search by name, email, course..." 
+                        class="w-full pl-12 pr-4 py-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500 focus:bg-opacity-80 transition-all duration-300">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button 
+                        onclick="clearSearch()"
+                        class="px-6 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 border border-gray-600 hover:border-gray-500">
+                        <i class="fas fa-eraser"></i>
+                        Clear
+                    </button>
+                    <button 
+                        onclick="openAddModal()"
+                        class="px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-bold transition-all duration-300 flex items-center gap-3 red-glow hover-lift">
+                        <i class="fas fa-user-plus text-lg"></i>
+                        Add New Student
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="glass-effect rounded-2xl overflow-hidden hover-lift">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-red-900 to-black border-b border-red-800">
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-id-badge mr-2"></i>Student Info
+                            </th>
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-envelope mr-2"></i>Contact
+                            </th>
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-calendar mr-2"></i>Age
+                            </th>
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-graduation-cap mr-2"></i>Course
+                            </th>
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-users mr-2"></i>Batch
+                            </th>
+                            <th class="px-6 py-5 text-left font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-clock mr-2"></i>Joined
+                            </th>
+                            <th class="px-6 py-5 text-center font-bold text-red-200 uppercase tracking-wider">
+                                <i class="fas fa-cog mr-2"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="divide-y divide-gray-800">
+                        <!-- Sample data - will be replaced by your backend -->
+                        <tr class="table-row-hover border-b border-gray-800 transition-all duration-300">
+                            <td class="px-6 py-5">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                                        <span class="text-white font-bold text-lg">JD</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-lg font-bold text-white">John Doe</div>
+                                        <div class="text-sm text-gray-400">ID: STU001</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="text-gray-300">john.doe@example.com</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="inline-block bg-red-900 text-red-200 px-3 py-1 rounded-full text-sm font-medium">22</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="inline-block bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">Computer Science</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="inline-block bg-black border-2 border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm font-bold">CS-2024-A</span>
+                            </td>
+                            <td class="px-6 py-5 text-gray-400">
+                                Jan 15, 2024
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex gap-3 justify-center">
+                                    <button class="p-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl transition-all duration-300 hover-lift" title="Edit Student">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-300 hover-lift" title="Delete Student">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="addModal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl shadow-2xl w-full max-w-lg mx-4 border-2 border-red-900">
+            <div class="bg-gradient-to-r from-red-600 to-red-700 px-8 py-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-user-plus mr-3"></i>
+                    Add New Student
+                </h2>
+            </div>
+            
+            <form id="AddForm" class="p-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-user mr-2"></i>Full Name
+                        </label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            id="name"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300"
+                            placeholder="Enter student name">
+                        <p id="nameError" class="text-red-400 text-sm mt-2 hidden">Name must be at least 2 letters</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-red-300 font-semibold mb-2">
+                                <i class="fas fa-birthday-cake mr-2"></i>Age
+                            </label>
+                            <input 
+                                type="number" 
+                                name="age" 
+                                id="age"
+                                class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300"
+                                placeholder="Age">
+                            <p id="ageError" class="text-red-400 text-sm mt-2 hidden">Enter a valid age (1–100)</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-red-300 font-semibold mb-2">
+                                <i class="fas fa-users mr-2"></i>Batch
+                            </label>
+                            <input 
+                                type="text" 
+                                name="batch" 
+                                id="batch"
+                                class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300"
+                                placeholder="Batch code">
+                            <p id="batchError" class="text-red-400 text-sm mt-2 hidden">Batch is required</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-envelope mr-2"></i>Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="email"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300"
+                            placeholder="student@example.com">
+                        <p id="emailError" class="text-red-400 text-sm mt-2 hidden">Invalid email format</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-graduation-cap mr-2"></i>Course
+                        </label>
+                        <input 
+                            type="text" 
+                            name="course" 
+                            id="course"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300"
+                            placeholder="Course name">
+                        <p id="courseError" class="text-red-400 text-sm mt-2 hidden">Course is required</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mt-8">
+                    <button 
+                        type="button" 
+                        onclick="closeAddModal()"
+                        class="flex-1 px-6 py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold transition-all duration-300 border border-gray-600">
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-6 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl font-bold transition-all duration-300 red-glow">
+                        <i class="fas fa-save mr-2"></i>Save Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl shadow-2xl w-full max-w-lg mx-4 border-2 border-red-900">
+            <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 px-8 py-6 rounded-t-2xl">
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-edit mr-3"></i>
+                    Edit Student
+                </h2>
+            </div>
+            
+            <form id="editForm" class="p-8">
+                <input type="hidden" id="editId" name="id">
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-user mr-2"></i>Full Name
+                        </label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            id="editName"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-red-300 font-semibold mb-2">
+                                <i class="fas fa-birthday-cake mr-2"></i>Age
+                            </label>
+                            <input 
+                                type="number" 
+                                name="age" 
+                                id="editAge"
+                                class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-red-300 font-semibold mb-2">
+                                <i class="fas fa-users mr-2"></i>Batch
+                            </label>
+                            <input 
+                                type="text" 
+                                name="batch" 
+                                id="editBatch"
+                                class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-envelope mr-2"></i>Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="editEmail"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-red-300 font-semibold mb-2">
+                            <i class="fas fa-graduation-cap mr-2"></i>Course
+                        </label>
+                        <input 
+                            type="text" 
+                            name="course" 
+                            id="editCourse"
+                            class="w-full p-4 bg-black bg-opacity-60 border-2 border-red-900 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-all duration-300">
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mt-8">
+                    <button 
+                        type="button" 
+                        onclick="closeEditModal()"
+                        class="flex-1 px-6 py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold transition-all duration-300 border border-gray-600">
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-6 py-4 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white rounded-xl font-bold transition-all duration-300">
+                        <i class="fas fa-save mr-2"></i>Update Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        // Validators
+        const validators = {
+            name: {
+                regex: /^[A-Za-z\s]{2,}$/,
+                errorMsg: "Name must be at least 2 letters"
+            },
+            age: {
+                regex: /^(1[1][0-9]|100|[1-9][0-9]?)$/,
+                errorMsg: "Enter a valid age (1–100)"
+            },
+            email: {
+                regex: /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                errorMsg: "Invalid email format"
+            },
+            batch: {
+                regex: /^[A-Za-z0-9\s]{2,}$/,
+                errorMsg: "Batch is required (letters & digits only)"
+            },
+            course: {
+                regex: /^[A-Za-z\s]{2,}$/,
+                errorMsg: "Course is required"
+            }
+        };
+
+        // Generate initials from name
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        // function validateField(fieldId) {
+        //     const input = document.getElementById(fieldId);
+        //     const error = document.getElementById(fieldId + "Error");
+        //     const { regex, errorMsg } = validators[fieldId];
+        //     const value = input.value.trim();
+
+        //     if (!regex.test(value)) {
+        //         input.classList.add('border-red-500');
+        //         error.textContent = errorMsg;
+        //         error.classList.remove('hidden');
+        //         return false;
+        //     } else {
+        //         input.classList.remove('border-red-500');
+        //         error.classList.add('hidden');
+        //         return true;
+        //     }
+        // }
+
+        // Object.keys(validators).forEach(fieldId => {
+        //     const input = document.getElementById(fieldId);
+        //     input.addEventListener('input', () => validateField(fieldId))
+        // });
+
+        // Generate student row
+        function generateStudentRow(student) {
+            return `
+                <tr class="table-row-hover border-b border-gray-800 transition-all duration-300">
+                    <td class="px-6 py-5">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                                <span class="text-white font-bold text-lg">${getInitials(student.name)}</span>
+                            </div>
+                            <div>
+                                <div class="text-lg font-bold text-white">${student.name}</div>
+                                <div class="text-sm text-gray-400">ID: STU${student._id.padStart(3, '0')}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="text-gray-300">${student.email}</div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-block bg-red-900 text-red-200 px-3 py-1 rounded-full text-sm font-medium">${student.age}</span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-block bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">${student.course}</span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-block bg-black border-2 border-red-500 text-red-400 px-4 py-2 rounded-lg text-sm font-bold">${student.batch}</span>
+                    </td>
+                    <td class="px-6 py-5 text-gray-400">
+                        ${new Date(student.createdAt).toLocaleDateString()}
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex gap-3 justify-center">
+                            <button 
+                                onclick="openEditModal('${student._id}','${student.name}', '${student.age}', '${student.email}', '${student.batch}', '${student.course}')"
+                                class="p-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl transition-all duration-300 hover-lift" 
+                                title="Edit Student">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button 
+                                onclick="deleteStudent('${student._id}')"
+                                class="p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all duration-300 hover-lift" 
+                                title="Delete Student">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Validation functions
+        function validateField(fieldId) {
+            const input = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + "Error");
+            const { regex, errorMsg } = validators[fieldId];
+            const value = input.value.trim();
+
+            if (!regex.test(value)) {
+                input.classList.add('border-red-500');
+                input.classList.remove('border-red-900');
+                error.textContent = errorMsg;
+                error.classList.remove('hidden');
+                return false;
+            } else {
+                input.classList.remove('border-red-500');
+                input.classList.add('border-red-900');
+                error.classList.add('hidden');
+                return true;
+            }
+        }
+
+        // Add validation listeners
+        Object.keys(validators).forEach(fieldId => {
+            const input = document.getElementById(fieldId);
+            if (input) {
+                input.addEventListener('input', () => validateField(fieldId));
+            }
+        });
+
+        // Modal functions
+        function openAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('AddForm').reset();
+        }
+
+        function openEditModal(id, name, age, email, batch, course) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editAge').value = age;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editBatch').value = batch;
+            document.getElementById('editCourse').value = course;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Search functionality
+        function search() {
+            const query = document.getElementById("searchInput").value.trim().toLowerCase();
+            const filteredStudents = students.filter(student => 
+                student.name.toLowerCase().includes(query) ||
+                student.email.toLowerCase().includes(query) ||
+                student.course.toLowerCase().includes(query) ||
+                student.batch.toLowerCase().includes(query)
+            );
+            renderStudents(filteredStudents);
+        }
+
+        function clearSearch() {
+            document.getElementById("searchInput").value = '';
+            renderStudents(students);
+        }
+
+        // Delete student
+        function deleteStudent(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#374151',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Remove student from array (replace with actual API call)
+                    students = students.filter(student => student._id !== id);
+                    renderStudents(students);
+                    updateStats();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Student has been deleted successfully.',
+                        confirmButtonColor: '#dc2626',
+                        background: '#1a1a1a',
+                        color: '#ffffff'
+                    });
+                }
+            });
+        }
+
+        // Render students
+        function renderStudents(studentsArray) {
+            const tbody = document.getElementById("studentTableBody");
+            if (studentsArray.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-user-slash text-6xl text-gray-600 mb-4"></i>
+                                <h3 class="text-xl font-bold text-gray-400 mb-2">No Students Found</h3>
+                                <p class="text-gray-500">Try adjusting your search criteria</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = studentsArray.map(student => generateStudentRow(student)).join('');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalStudents = students.length;
+            const uniqueCourses = [...new Set(students.map(s => s.course))].length;
+            const uniqueBatches = [...new Set(students.map(s => s.batch))].length;
+
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('totalCourses').textContent = uniqueCourses;
+            document.getElementById('totalBatches').textContent = uniqueBatches;
+        }
+
+        // Form submissions
+        // document.getElementById('AddForm').addEventListener("submit", (e) => {
+        //     e.preventDefault();
+            
+        //     let isFormValid = true;
+        //     Object.keys(validators).forEach(fieldId => {
+        //         const valid = validateField(fieldId);
+        //         if (!valid) isFormValid = false;
+        //     });
+
+        //     if (!isFormValid) { // Not isFormVald
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Validation Error',
+        //             text: 'Please fix the highlighted fields before submitting.',
+        //             confirmButtonColor: '#dc2626',
+        //             background: '#1a1a1a',
+        //             color: '#ffffff'
+        //         });
+        //         return;
+        //     }
+
+        //     const formData = new FormData(e.target);
+        //     const newStudent = {
+        //         _id: (students.length + 1).toString(),
+        //         name: formData.get('name'),
+        //         age: parseInt(formData.get('age')),
+        //         email: formData.get('email'),
+        //         batch: formData.get('batch'),
+        //         course: formData.get('course'),
+        //         createdAt: new Date(),
+        //         updatedAt: new Date()
+        //     };
+
+        //     // Add to students array (replace with actual API call)
+        //     students.push(newStudent);
+        //     renderStudents(students);
+        //     updateStats();
+        //     closeAddModal();
+
+        //     Swal.fire({
+        //         icon: 'success',
+        //         title: 'Success!',
+        //         text: 'Student added successfully!',
+        //         showConfirmButton: false,
+        //         timer: 1500,
+        //         background: '#1a1a1a',
+        //         color: '#ffffff'
+        //     });
+        // });
+
+        const addForm = document.getElementById('AddForm')
+        addForm.addEventListener("submit", (e) => {
+            e.preventDefault()
+            let formdata = new FormData(addForm)
+            let data = {
+                name: formdata.get('name'),
+                age: parseInt(formdata.get('age')),
+                email: formdata.get('email'),
+                batch: formdata.get('batch'),
+                course: formdata.get('course')
+            }
+            let isFormValid = true;
+            Object.keys(validators).forEach(fieldId => {
+                const valid = validateField(fieldId);
+                if (!valid) isFormValid = false;
+            });
+
+            if (!isFormValid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Form is invalid',
+                    text: 'Please fix the highlighted fields before submitting.',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Okay'
+                });
+            } else {
+                fetch("/addStudent", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data, 'data')
+                        if (data.success === false) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Something Went Wrong',
+                                text: data.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#d33'
+                            });
+                            return;
+                        }
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Added successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                        const tbody = document.getElementById("studentTableBody");
+                        tbody.innerHTML = "";
+                        if (data.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>`;
+                            return;
+                        }
+
+                        // const modal = document.getElementById('studentTableBody');
+                        // tbody.innerHTML = "";
+                        // if (data.length === 0) {
+                        //     tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No students found.</td></tr>`;
+                        //     return;
+                        // }
+                    })
+            }
+        })
+
+        document.getElementById('editForm').addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const studentId = formData.get('id');
+            const updatedStudent = {
+                name: formData.get('name'),
+                age: parseInt(formData.get('age')),
+                email: formData.get('email'),
+                batch: formData.get('batch'),
+                course: formData.get('course'),
+                updatedAt: new Date()
+            };
+
+            // Update student in array (replace with actual API call)
+            const index = students.findIndex(s => s._id === studentId);
+            if (index !== -1) {
+                students[index] = { ...students[index], ...updatedStudent };
+                renderStudents(students);
+                updateStats();
+                closeEditModal();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: 'Student information updated successfully!',
+                    confirmButtonColor: '#dc2626',
+                    background: '#1a1a1a',
+                    color: '#ffffff'
+                });
+            }
+        });
+
+        // Event listeners
+        document.getElementById("searchInput").addEventListener("input", search);
+
+        // Close modals when clicking outside
+        document.getElementById('addModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeAddModal();
+        });
+
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeEditModal();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents(students);
+            updateStats();
+        });
+
+        // Custom SweetAlert2 styling
+        const swalStyled = Swal.mixin({
+            customClass: {
+                popup: 'glass-effect',
+                title: 'text-red-400',
+                confirmButton: 'bg-red-600 hover:bg-red-700',
+                cancelButton: 'bg-gray-600 hover:bg-gray-700'
+            },
+            buttonsStyling: false
+        });
+    </script>
+</body>
+</html>
